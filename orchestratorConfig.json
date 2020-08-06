@@ -1,0 +1,13 @@
+{
+    "parallelizm" : 4,
+    "browsers" : ["chrome", "firefox"],
+    "timeout" : "20m",
+    "environment" : {
+        "DOCKER_TAG": "master_283"
+    },
+    "preCommands" : ["docker-compose -f /opt/code/github/cloud-fe-components/cypress.docker-compose.yml up -d cloud_fe_components"],
+    "dockerComposePath" : "/opt/code/github/cloud-fe-components/cypress.docker-compose.yml",
+    "specsHomePath" : "/opt/code/github/cloud-fe-components/tests/visual_testing/integration/",
+    "mochawesomeReportPath" : "/opt/code/github/cloud-fe-components/tests/report/mochawesome-report/*.json",
+    "specsDockerPath" : "tests/visual_testing/integration/"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@0xislamtaha/orchestrator",
+  "version": "1.0.0",
+  "description": "orchestrate cypress parallel execution across multiple Docker containers",
+  "main": "orchestrator.js",
+  "scripts": {
+    "test": "echo \"No test specified\""
+  },
+  "author": "0xIslamTaha",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "shelljs": "^0.8.4",
+    "mochawesome-merge": "^4.1.0",
+    "mochawesome-report-generator": "^5.1.0"
+  }
+}
