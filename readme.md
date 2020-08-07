@@ -12,7 +12,7 @@ npm -g install 0xislamtaha/orchestrator
 
 simple with a configuration file, execute the following commands
 ```bash
-orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]"
+orchestrator --config ./src/config.json
 ```
 
 If you need to overwrite any configuration, simplly path the new configuration as a prameter.
