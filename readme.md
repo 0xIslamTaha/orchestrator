@@ -1,7 +1,7 @@
 # 🔥 orchestrator 🔥
 Orchestrator exeutes all cypress specs across n parallel docker containers based on a configuration file.
 
-## ♟️ Orchestrator allow us to:
+## ♟️ Orchestrator features:
 
 * Pares a config file 
 * Execute n containers machines  in parallel
