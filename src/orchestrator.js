@@ -8,7 +8,7 @@ import path from 'path';
 function execa(command) {
     return new Promise((resolve, reject) => sh.exec(command, function(code, stdout, error) {
         if (code != 0) {
-            return reject(error);
+            return reject(code);
         }
         return resolve(code);
     }))
@@ -115,9 +115,9 @@ export function orchestrator(rawArgs){
     Promise.all(upConrainters(config)).then( () => {
         downContainers(config);
         generateReport(config);
-    }).catch( (error) => {
-        console.log(error);
+    }).catch( (exitCode) => {
         downContainers(config);
         generateReport(config);
+        sh.exit(exitCode);
     })
 }
