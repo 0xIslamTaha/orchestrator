@@ -3,6 +3,7 @@ import marge from 'mochawesome-report-generator';
 import { merge }from 'mochawesome-merge';
 import fs from 'fs'
 import arg from 'arg';
+import path from 'path';
 
 function execa(command) {
     return new Promise((resolve, reject) => sh.exec(command, function(code, stdout, error) {
@@ -42,7 +43,7 @@ function parseArgumentsIntoConfig(rawArgs) {
   }
 
 function overWriteConfig(args){
-    let configFile = args['--config'] || './src/config.json';
+    let configFile = args['--config'] || path.resolve(__dirname, 'config.json');
     let config = JSON.parse(fs.readFileSync(configFile));
     return {...config, ...args};
 }
