@@ -109,17 +109,15 @@ function generateReport(config) {
   }
 
 export function orchestrator(rawArgs){
-    //./bin/orchestrator --config ./src/config.json --parallelizm 4 --environment '{"DOCKER_TAG":"master_290"}'
     let config = overWriteConfig(parseArgumentsIntoConfig(rawArgs));
-    console.log(config)
-    // setEnvVars(config)
-    // execPreCommands(config)
-    // Promise.all(upConrainters(config)).then( () => {
-    //     downContainers(config);
-    //     generateReport(config);
-    // }).catch( (error) => {
-    //     console.log(error);
-    //     downContainers(config);
-    //     generateReport(config);
-    // })
+    setEnvVars(config)
+    execPreCommands(config)
+    Promise.all(upConrainters(config)).then( () => {
+        downContainers(config);
+        generateReport(config);
+    }).catch( (error) => {
+        console.log(error);
+        downContainers(config);
+        generateReport(config);
+    })
 }
