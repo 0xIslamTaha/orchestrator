@@ -1,5 +1,5 @@
 {
-    "parallelizm" : 4,
+    "parallelizm" : 1,
     "browsers" : ["chrome", "firefox"],
     "timeout" : "20m",
     "environment" : {
@@ -8,6 +8,7 @@
     "preCommands" : ["docker-compose -f /opt/code/github/cloud-fe-components/cypress.docker-compose.yml up -d cloud_fe_components"],
     "dockerComposePath" : "/opt/code/github/cloud-fe-components/cypress.docker-compose.yml",
     "specsHomePath" : "/opt/code/github/cloud-fe-components/tests/visual_testing/integration/",
-    "mochawesomeReportPath" : "/opt/code/github/cloud-fe-components/tests/report/mochawesome-report/*.json",
+    "mochawesomeJSONPath" : "/opt/code/github/cloud-fe-components/tests/report/mochawesome-report/*.json",
+    "reportPath" : "./",
     "specsDockerPath" : "tests/visual_testing/integration/"
 }

@@ -1,0 +1,1 @@
+./bin/orchestrator --config ./src/config.json --parallelizm 1 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]"
