@@ -1,5 +1,5 @@
 # 🔥 orchestrator 🔥
-Orchestrator package to run split all cypress specs across n parallel docker containers based on a configuration file.
+Orchestrator exeutes all cypress specs across n parallel docker containers based on a configuration file.
 
 ## ♟️ Orchestrator allow us to:
 
