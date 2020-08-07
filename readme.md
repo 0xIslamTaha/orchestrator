@@ -18,12 +18,17 @@ npm -g install 0xislamtaha/orchestrator
 
 ## 🎮 Usage:
 
-simple with a configuration file, execute the following commands
+With the defualt configuration file i.e, "src/config.json"
 ```bash
-orchestrator --config ./src/config.json
+orchestrator
 ```
 
-If you need to overwrite any configuration, simplly path the new configuration as a prameter.
+With your own configuration file
+```bash
+orchestrator --config "/path/to/config.json"
+```
+
+If you need to overwrite any configuration on the fly, simplly path the new configuration as a prameter.
 ```bash
 orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]"
 ```
