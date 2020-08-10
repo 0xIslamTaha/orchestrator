@@ -39,7 +39,7 @@ function parseArgumentsIntoConfig(rawArgs) {
         } 
         result[key] = variable;
     }
-    return result;
+    return {...result, ...args};
   }
 
 function overWriteConfig(args){
