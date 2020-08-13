@@ -90,7 +90,7 @@ function upConrainters(config) {
     config.browsers.forEach(browser => {
         specsForMachines.forEach(specPerMachine => {
             container_name = `container_${browser}_${specsForMachines.indexOf(specPerMachine)}`
-            command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} cypress_chrome npx cypress run -b ${browser} --headless --spec ${specPerMachine}`;
+            command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} cypress_container npx cypress run -b ${browser} --headless --spec ${specPerMachine}`;
 
             promises.push(execa(command));
         })
