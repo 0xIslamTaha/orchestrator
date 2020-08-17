@@ -8,7 +8,9 @@
     "preCommands" : ["docker-compose -f /opt/code/github/cloud-fe-components/cypress.docker-compose.yml up -d cloud_fe_components"],
     "dockerComposePath" : "/opt/code/github/cloud-fe-components/cypress.docker-compose.yml",
     "specsHomePath" : "/opt/code/github/cloud-fe-components/tests/visual_testing/integration/",
+    "specsDockerPath" : "tests/visual_testing/integration/",
+    "cypressContainerName" : "cypress_container",
     "mochawesomeJSONPath" : "/opt/code/github/cloud-fe-components/tests/report/mochawesome-report/*.json",
-    "reportPath" : "./",
-    "specsDockerPath" : "tests/visual_testing/integration/"
+    "reportPath" : "./"
+    
 }

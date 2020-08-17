@@ -18,7 +18,7 @@ function parseArgumentsIntoConfig(rawArgs) {
     const args = arg(
       {
         '--config': String,
-        '-c': '--config',
+        '-c': '--config'
       },
       {
         argv: rawArgs.slice(2),
@@ -89,8 +89,8 @@ function upConrainters(config) {
     let specsForMachines = genearateSpecsForMachines(config);
     config.browsers.forEach(browser => {
         specsForMachines.forEach(specPerMachine => {
-            container_name = `container_${browser}_${specsForMachines.indexOf(specPerMachine)}_${Math.floor(Math.random()*100000)}`
-            command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} cypress_container npx cypress run -b ${browser} --headless --spec ${specPerMachine}`;
+            container_name = `container_${Math.floor(Math.random()*100000)}_${browser}_${specsForMachines.indexOf(specPerMachine)}`
+            command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContinerName} npx cypress run -b ${browser} --headless --spec ${specPerMachine}`;
             promises.push(execa(command));
         })
     })
