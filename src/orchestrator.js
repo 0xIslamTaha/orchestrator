@@ -117,6 +117,6 @@ export function orchestrator(rawArgs){
     }).catch( (exitCode) => {
         downContainers(config);
         generateReport(config);
-        sh.exit(exitCode);
+        setTimeout(() => sh.exit(exitCode), 5000);
     })
 }
