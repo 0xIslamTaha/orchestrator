@@ -1,7 +1,7 @@
 # 🔥 orchestrator 🔥
 ![orchestrator](digram.png)
 
-Orchestrator exeutes all cypress specs across n parallel docker containers based on a configuration file.
+Orchestrator executes all cypress specs across n parallel docker containers based on a configuration file.
 
 ## ♟️ Orchestrator features:
 
@@ -55,6 +55,64 @@ networks:
 }
 ```
 
+3- Create the orchestrator configuration file
+```
+- parallelizm:
+    description: number of container machines per browser
+    type: Integer
+    example: 2
+
+- browser:
+    description: list of browsers
+    type: list
+    example: ["chrome", "firefox"]
+
+- timeout:
+    description: timeout of each process of cypress 
+    type: string
+    example: "20m"
+
+- environment:
+    description: enviroment variable to be exported 
+    type: dict
+    example: {"DOCKER_TAG": "master_283"}
+
+- preCommands: 
+    description: list of commands to be executed befor the deployment of the cypress containers
+    type: list
+    example: ["ls -al", "mkdir -p test"],
+
+- dockerComposePath:
+    description: path to the docker compose file.
+    type: string
+    example: "/opt/code/github/cypress.docker-compose.yml"
+
+- specsHomePath:
+    description: path to the specs dir in the host machine.
+    type: string
+    example: "/opt/code/github/cypress/integration/"
+
+- specsDockerPath:
+    description: path to the specs dir in the cypress container.
+    type: string
+    example: "/cypress/integration"
+
+- cypressContainerName:
+    description: the name of cypress service.
+    type: sting
+    example: "cypress_service"
+
+- mochawesomeJSONPath:
+    description: path to the mochawseom dir in the host machine.
+    type: string
+    example: "mochawesome-report/*.json"
+
+- reportPath:
+    description: path to save the generated HTML report dir.
+    type: string
+    example: "./"
+
+```
 
 ## 👌 Installation:
 
@@ -64,12 +122,12 @@ npm -g install 0xislamtaha/orchestrator
 
 ## 🎮 Usage:
 
-* With the defualt configuration file i.e, "src/config.json"
+* With the default configuration file i.e, "src/config.json"
 ```bash
 orchestrator
 ```
 
-* With your own configuration file
+* With your configuration file
 ```bash
 orchestrator --config "/path/to/config.json"
 ```
