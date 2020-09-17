@@ -12,8 +12,34 @@ Orchestrator executes all cypress specs across n parallel docker containers base
 * Down all the running containers
 * Generate one HTML report that has all specs execution results. 
 
-## Requirements to use orchrestrator:
-1- docker-compose file with a cypress service
+
+## 👌 Installation:
+
+```bash
+npm -g install 0xislamtaha/orchestrator
+```
+
+## 🎮 Usage:
+
+* With the default configuration file i.e, "src/config.json"
+```bash
+orchestrator
+```
+
+* With your configuration file
+```bash
+orchestrator --config "/path/to/config.json"
+```
+
+If you need to **overwrite** any configuration on the fly, simplly path the new configuration as a prameter.
+```bash
+orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]"
+```
+
+
+## 🔑 Requirements to use orchrestrator:
+1- docker-compose file with a cypress service. here is an example of it.
+
 ```yml
 version: '3'
 services:
@@ -42,7 +68,8 @@ networks:
     driver: bridge
 
 ```
-2- use mochawsome as a reporter in cypress.json
+2- use mochawsome as a reporter in cypress.json, just add the following snippet to your cypress.json.
+
 ```json
 {
   "reporter": "mochawesome",
@@ -55,7 +82,8 @@ networks:
 }
 ```
 
-3- Create the orchestrator configuration file
+3- Edit the orchestrator [configuration file](/src/config.json) with your configuration. Here is the description of each configuration option.
+
 ```
 - parallelizm:
     description: number of container machines per browser
@@ -112,29 +140,6 @@ networks:
     type: string
     example: "./"
 
-```
-
-## 👌 Installation:
-
-```bash
-npm -g install 0xislamtaha/orchestrator
-```
-
-## 🎮 Usage:
-
-* With the default configuration file i.e, "src/config.json"
-```bash
-orchestrator
-```
-
-* With your configuration file
-```bash
-orchestrator --config "/path/to/config.json"
-```
-
-If you need to **overwrite** any configuration on the fly, simplly path the new configuration as a prameter.
-```bash
-orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]"
 ```
 
 ## 🎬 To-Do:
