@@ -26,5 +26,6 @@
   "files": [
     "bin/",
     "src/"
-  ]
+  ],
+  "type": "module"
 }
