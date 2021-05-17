@@ -128,18 +128,26 @@ function generateReport(config) {
   );
 }
 
+function afterPromises(config, timer) {
+  downContainers(config);
+  generateReport(config);
+  console.log(" ExecutionTime: ")
+  console.timeEnd(timer);
+}
+
 export function orchestrator(rawArgs) {
+  let orchestratorTime = 'orchestratorTime';
   let config = overWriteConfig(parseArgumentsIntoConfig(rawArgs));
+
+  console.time(orchestratorTime);
   setEnvVars(config);
   execPreCommands(config);
   Promise.all(upConrainters(config))
     .then(() => {
-      downContainers(config);
-      generateReport(config);
+      afterPromises(config, orchestratorTime);
     })
     .catch((exitCode) => {
-      downContainers(config);
-      generateReport(config);
+      afterPromises(config, orchestratorTime);
       setTimeout(() => sh.exit(exitCode), 5000);
     });
 }
