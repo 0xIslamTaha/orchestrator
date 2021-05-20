@@ -78,7 +78,7 @@ function execPreCommands(config) {
 }
 
 function genearateSpecsForMachines(config) {
-  let specs = sh.ls(config.specsHomePath);
+  let specs = config.specs.length > 0 ? config.specs:sh.ls(config.specsHomePath);
   let [start, end] = [0, 0];
   let specsForMachines = [];
 
@@ -131,7 +131,7 @@ function generateReport(config) {
 function afterPromises(config, timer) {
   downContainers(config);
   generateReport(config);
-  console.log(" ExecutionTime: ")
+  console.log("\bExecutionTime: ")
   console.timeEnd(timer);
 }
 

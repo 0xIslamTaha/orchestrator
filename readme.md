@@ -140,6 +140,11 @@ networks:
     type: string
     example: "./"
 
+- specs:
+    description: array of specific specs to be executed
+    type: array
+    example: ["test.js", "test2.js"]
+
 ```
 
 ## 🎬 To-Do:

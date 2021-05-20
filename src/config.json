@@ -11,6 +11,6 @@
     "specsDockerPath" : "tests/visual_testing/integration/",
     "cypressContainerName" : "cypress_container",
     "mochawesomeJSONPath" : "/opt/code/github/cloud-fe-components/tests/report/mochawesome-report/*.json",
-    "reportPath" : "./"
-    
+    "reportPath" : "./",
+    "specs": []
 }
