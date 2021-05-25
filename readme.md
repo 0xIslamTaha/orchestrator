@@ -3,15 +3,28 @@
 
 Orchestrator executes all cypress specs across n parallel docker containers based on a configuration file.
 
-## ♟️ Orchestrator features:
+## 😎 Orchestrator Tutorial:
+1- [Cypress parallelization with the Orchestrator — part 1](https://0xislamtaha.medium.com/cypress-parallelization-with-the-orchestrator-part-1-255989094deb)
+
+2- [Cypress parallelization with the Orchestrator — part 2 — ShowCase](https://0xislamtaha.medium.com/cypress-parallelization-with-the-orchestrator-part-2-showcase-c78202b17c7a)
+
+## 😍 Usecases:
+- [Orchestrator-Public-Use-Case](https://github.com/0xIslamTaha/orchestrator-public-use-case)
+
+## ♟️ Orchestrator mechanism:
 
 * Pares a config file 
 * Create n containers machines  in parallel
 * Split all specs across all those machines 
 * Collect all the execution results from those containers 
 * Down all the running containers
-* Generate one HTML report that has all specs execution results. 
+* Generate one HTML report that has all specs execution results
 
+## Features:
+- Create n chrome containers and/or n firefox containers
+- Split the spcecs accross those continers
+- Manage the results
+- Generate HTML report
 
 ## 👌 Installation:
 
