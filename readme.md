@@ -54,32 +54,16 @@ orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_
 1- docker-compose file with a cypress service. here is an example of it.
 
 ```yml
-version: '3'
+
+version: '3.8'
 services:
-  SYSTEM_UNDER_TEST:
-    container_name: SYSTEM_UNDER_TEST
-    image: SYSTEM_UNDER_TEST_IMAGE
-    networks:
-      modules_cypress_tests_nw: {}
-
-  cypress_service:
-    container_name: cypress__container
-    image: cypress/browsers:node13.8.0-chrome81-ff75
-    depends_on:
-      - SYSTEM_UNDER_TEST
-    environment:
-      - CYPRESS_baseUrl=http://SYSTEM_UNDER_TEST
+  cypress-container:
+    build: ./
+    network_mode: "bridge"
     volumes:
-      - ./cypress/:/cypress
-      - ./mochawesome-report:/cypress/report/mochawesome-report
+      - ./cypress/:/orechestrator_usecase/cypress
+      - ./mochawesome-report:/orechestrator_usecase/mochawesome-report
       - /dev/shm:/dev/shm
-    networks:
-      modules_cypress_tests_nw: {}
-
-networks:
-  modules_cypress_tests_nw:
-    driver: bridge
-
 ```
 2- use mochawsome as a reporter in cypress.json, just add the following snippet to your cypress.json.
 
