@@ -16,9 +16,9 @@ function execa(command, flag = true) {
             .toLowerCase()
             .includes("cypress failed to make a connection to firefox")
         ) {
-          oldContName = command.split("--name ")[1].split(" ")[0];
-          newContName = `${oldContName}_${Math.floor(Math.random() * 100000)}`;
-          cmd = command.replace(oldContName, newContName);
+          let oldContName = command.split("--name ")[1].split(" ")[0];
+          let newContName = `${oldContName}_${Math.floor(Math.random() * 100000)}`;
+          let cmd = command.replace(oldContName, newContName);
           setTimeout(() => execa(cmd, false), 1000);
         } else {
           return reject(code);
