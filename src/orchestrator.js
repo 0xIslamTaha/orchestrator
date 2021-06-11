@@ -78,7 +78,7 @@ function execPreCommands(config) {
 }
 
 function genearateSpecsForMachines(config) {
-  let specs = sh.ls(config.specsHomePath);
+  let specs = config.specs.length > 0 ? config.specs:sh.ls(config.specsHomePath);
   let [start, end] = [0, 0];
   let specsForMachines = [];
 
@@ -128,18 +128,26 @@ function generateReport(config) {
   );
 }
 
+function afterPromises(config, timer) {
+  downContainers(config);
+  generateReport(config);
+  console.log("\bExecutionTime: ")
+  console.timeEnd(timer);
+}
+
 export function orchestrator(rawArgs) {
+  let orchestratorTime = 'orchestratorTime';
   let config = overWriteConfig(parseArgumentsIntoConfig(rawArgs));
+
+  console.time(orchestratorTime);
   setEnvVars(config);
   execPreCommands(config);
   Promise.all(upConrainters(config))
     .then(() => {
-      downContainers(config);
-      generateReport(config);
+      afterPromises(config, orchestratorTime);
     })
     .catch((exitCode) => {
-      downContainers(config);
-      generateReport(config);
+      afterPromises(config, orchestratorTime);
       setTimeout(() => sh.exit(exitCode), 5000);
     });
 }

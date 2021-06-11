@@ -3,15 +3,28 @@
 
 Orchestrator executes all cypress specs across n parallel docker containers based on a configuration file.
 
-## ♟️ Orchestrator features:
+## 😎 Orchestrator Tutorial:
+1- [Cypress parallelization with the Orchestrator — part 1](https://0xislamtaha.medium.com/cypress-parallelization-with-the-orchestrator-part-1-255989094deb)
+
+2- [Cypress parallelization with the Orchestrator — part 2 — ShowCase](https://0xislamtaha.medium.com/cypress-parallelization-with-the-orchestrator-part-2-showcase-c78202b17c7a)
+
+## 😍 Usecases:
+- [Orchestrator-Public-Use-Case](https://github.com/0xIslamTaha/orchestrator-public-use-case)
+
+## ♟️ Orchestrator mechanism:
 
 * Pares a config file 
 * Create n containers machines  in parallel
 * Split all specs across all those machines 
 * Collect all the execution results from those containers 
 * Down all the running containers
-* Generate one HTML report that has all specs execution results. 
+* Generate one HTML report that has all specs execution results
 
+## Features:
+- Create n chrome containers and/or n firefox containers
+- Split the spcecs accross those continers
+- Manage the results
+- Generate HTML report
 
 ## 👌 Installation:
 
@@ -41,32 +54,16 @@ orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_
 1- docker-compose file with a cypress service. here is an example of it.
 
 ```yml
-version: '3'
+
+version: '3.8'
 services:
-  SYSTEM_UNDER_TEST:
-    container_name: SYSTEM_UNDER_TEST
-    image: SYSTEM_UNDER_TEST_IMAGE
-    networks:
-      modules_cypress_tests_nw: {}
-
-  cypress_service:
-    container_name: cypress__container
-    image: cypress/browsers:node13.8.0-chrome81-ff75
-    depends_on:
-      - SYSTEM_UNDER_TEST
-    environment:
-      - CYPRESS_baseUrl=http://SYSTEM_UNDER_TEST
+  cypress-container:
+    build: ./
+    network_mode: "bridge"
     volumes:
-      - ./cypress/:/cypress
-      - ./mochawesome-report:/cypress/report/mochawesome-report
+      - ./cypress/:/orechestrator_usecase/cypress
+      - ./mochawesome-report:/orechestrator_usecase/mochawesome-report
       - /dev/shm:/dev/shm
-    networks:
-      modules_cypress_tests_nw: {}
-
-networks:
-  modules_cypress_tests_nw:
-    driver: bridge
-
 ```
 2- use mochawsome as a reporter in cypress.json, just add the following snippet to your cypress.json.
 
@@ -139,6 +136,11 @@ networks:
     description: path to save the generated HTML report dir.
     type: string
     example: "./"
+
+- specs:
+    description: array of specific specs to be executed
+    type: array
+    example: ["test.js", "test2.js"]
 
 ```
 
