@@ -145,6 +145,7 @@ services:
 ```
 
 ## 🎬 To-Do:
-
-* Export it to npm registry.
+* Export COMPOSE_PROJECT_NAME with random value if it doesnt exist.
+* Print the commands.
+* list configuration rather than multiple files.
 * Provide --help option.
