@@ -69,8 +69,11 @@ export function analyseReport(reportPath) {
       console.log(
         `------------------------- ${browser} -------------------------`
       );
-      console.log(
-        JSON.stringify(orderBasedOnBrowserDuration(browser), null, 2)
+      console.table(
+        orderBasedOnBrowserDuration(browser).map(spec => { return {
+          specName: spec.specName,
+          duration: spec.data.find( item => item.browser === browser ).duration
+        } })
       );
     }
   }
