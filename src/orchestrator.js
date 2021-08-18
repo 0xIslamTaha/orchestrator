@@ -4,6 +4,7 @@ import { merge } from "mochawesome-merge";
 import fs from "fs";
 import arg from "arg";
 import path from "path";
+import { analyseReport } from "./analyseReport";
 
 function execa(command, flag = true) {
   return new Promise((resolve, reject) =>
@@ -17,7 +18,9 @@ function execa(command, flag = true) {
             .includes("cypress failed to make a connection to firefox")
         ) {
           let oldContName = command.split("--name ")[1].split(" ")[0];
-          let newContName = `${oldContName}_${Math.floor(Math.random() * 100000)}`;
+          let newContName = `${oldContName}_${Math.floor(
+            Math.random() * 100000
+          )}`;
           let cmd = command.replace(oldContName, newContName);
           setTimeout(() => execa(cmd, false), 1000);
         } else {
@@ -78,7 +81,8 @@ function execPreCommands(config) {
 }
 
 function genearateSpecsForMachines(config) {
-  let specs = config.specs.length > 0 ? config.specs:sh.ls(config.specsHomePath);
+  let specs =
+    config.specs.length > 0 ? config.specs : sh.ls(config.specsHomePath);
   let [start, end] = [0, 0];
   let specsForMachines = [];
 
@@ -123,20 +127,51 @@ function downContainers(config) {
 }
 
 function generateReport(config) {
-  return merge({ files: [config.mochawesomeJSONPath] }).then((report) =>
-    marge.create(report, { reportDir: config.reportPath })
-  );
+  console.log("generate the report ....");
+  return merge({ files: [config.mochawesomeJSONPath] })
+    .then((report) =>
+      marge.create(report, {
+        reportDir: config.reportPath,
+        charts: true,
+        saveJson: true,
+      })
+    )
+    .then(() => {
+      if (config.analyseReport) _analyseReport(config);
+    });
+}
+
+function _analyseReport(config) {
+  let mergedMochawesomeJSONPath = "";
+  if (config.reportPath.includes(process.cwd())) {
+    mergedMochawesomeJSONPath = path.resolve(
+      process.cwd(),
+      config.reportPath,
+      "mochawesome.json"
+    );
+  } else {
+    mergedMochawesomeJSONPath = path.resolve(
+      config.reportPath,
+      "mochawesome.json"
+    );
+  }
+
+  analyseReport(mergedMochawesomeJSONPath);
 }
 
 function afterPromises(config, timer) {
   downContainers(config);
-  generateReport(config);
-  console.log("\bExecutionTime: ")
-  console.timeEnd(timer);
+  generateReport(config).then(() => {
+    console.log(
+      `\b------------------------- Exeuction Time -------------------------`
+    );
+    console.log("\bAll down in: ");
+    console.timeEnd(timer);
+  });
 }
 
 export function orchestrator(rawArgs) {
-  let orchestratorTime = 'orchestratorTime';
+  let orchestratorTime = "orchestratorTime";
   let config = overWriteConfig(parseArgumentsIntoConfig(rawArgs));
 
   console.time(orchestratorTime);
