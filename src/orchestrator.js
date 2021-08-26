@@ -1,3 +1,4 @@
+//@ts-check
 import sh from "shelljs";
 import marge from "mochawesome-report-generator";
 import { merge } from "mochawesome-merge";
@@ -80,44 +81,115 @@ function execPreCommands(config) {
   });
 }
 
-function genearateSpecsForMachines(config) {
-  let specs =
-    config.specs.length > 0 ? config.specs : sh.ls(config.specsHomePath);
-  let [start, end] = [0, 0];
+function orderBasedOnBrowserDuration(specs, browser) {
+  return specs.sort(function (a, b) {
+    let aDuration = a.data.find( item => item.browser === browser ).duration
+    let bDuration = b.data.find( item => item.browser === browser ).duration
+    return aDuration - bDuration;
+  });
+}
+
+function getListOfSpecs(config, browser) {
+  let existingSpecs = [];
+  
+  if (config.specs.length > 0) {
+    existingSpecs = config.specs;
+  } else {
+    existingSpecs = sh.ls(config.specsHomePath);     
+  }
+
+  let specsExecutionTime = JSON.parse(fs.readFileSync(config.specsExecutionTimePath));
+  let browserSpecs = orderBasedOnBrowserDuration(specsExecutionTime, browser).map(item => item.specName);
+  
+  let specs = browserSpecs.filter(spec => existingSpecs.includes(spec));
+  specs = [...specs, ...existingSpecs.filter(item => !specs.includes(item))];
+
+  return specs;
+}
+
+function splitSpecsOverMachines(specs, config) {
+  let noOfMachines = config.parallelizm * config.browsers.length;
   let specsForMachines = [];
-
-  if (config.parallelizm > specs.length) {
-    config.parallelizm = specs.length;
+  
+  for (let i=0; i<noOfMachines; i++){
+    specsForMachines.push([]); // [ [], [], [] ..]
   }
 
-  let index = specs.length / config.parallelizm;
-  for (let i = 0; i < config.parallelizm; i++) {
-    let result = "";
-    end = start + index;
-    specs.slice(start, end).forEach((spec) => {
-      spec = config.specsDockerPath + spec;
-      result = result + "," + spec;
-    });
-    specsForMachines.push(result.slice(1));
-    start = end;
+  let _cycles = 0;
+  while (specs.length > 0) {
+    for (let i=0; i<noOfMachines; i++){
+      _cycles % 2 ? specsForMachines[i].push(specs.pop()) : specsForMachines[i].push(specs.shift());
+    }
+    _cycles++;
   }
+
   return specsForMachines;
+}
+
+
+function genearateSpecsCommandsForMachines(config, browser) {
+  let specsCommandsOverMachines = [];  
+  
+  let specs = getListOfSpecs(config, browser);
+  let listOfSpecsOverMachines = splitSpecsOverMachines(specs, config);
+
+  listOfSpecsOverMachines.forEach((listOfspecsPerMachine) => {
+    let result = "";
+    listOfspecsPerMachine.forEach((spec) => {
+      result = `${result},${config.specsDockerPath}${spec}`;
+    });
+    specsCommandsOverMachines.push(result.slice(1));
+  });
+  
+  return specsCommandsOverMachines;
+}
+
+function generateSpecsCommandsOverMachinesOrederedByBrowsers(config) {
+  let specsCommandsOverMachinesOrederedByBrowsers = {}; // {'chrome': [ [] , [] , []], 'firefox': [[], [], []]}
+
+  config.browsers.forEach((browser) => {
+    specsCommandsOverMachinesOrederedByBrowsers[browser] = genearateSpecsCommandsForMachines(config, browser);
+  });
+
+  return specsCommandsOverMachinesOrederedByBrowsers;
+}
+
+
+function _constructCypressCommands(config) {
+  let noOfMachines = config.parallelizm * config.browsers.length;
+  let bashCommands = [];
+  let specsCommandsOverMachinesOrederedByBrowsers = generateSpecsCommandsOverMachinesOrederedByBrowsers(config);
+
+  for (let i=0; i<noOfMachines; i++){
+    let bashCommand = "exit_code=0";
+
+    config.browsers.forEach((browser) => {
+      bashCommand = `${bashCommand}; npx cypress run -b ${browser} --headless --spec ${specsCommandsOverMachinesOrederedByBrowsers[browser][i]} || exit_code=$? ; pkill -9 cypress`
+    });
+
+    bashCommand = `${bashCommand} ; exit $exit_code`;
+    bashCommands.push(bashCommand);
+  }
+  return bashCommands;
 }
 
 function upConrainters(config) {
   let promises = [];
+  let commands = [];
   let [container_name, command] = ["", ""];
-  let specsForMachines = genearateSpecsForMachines(config);
-  config.browsers.forEach((browser) => {
-    specsForMachines.forEach((specPerMachine) => {
+  let bashCommands = _constructCypressCommands(config);
+
+  bashCommands.forEach((cmd) => {
       container_name = `container_${Math.floor(
         Math.random() * 100000
-      )}_${browser}_${specsForMachines.indexOf(specPerMachine)}`;
-      command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContainerName} npx cypress run -b ${browser} --headless --spec ${specPerMachine}`;
+      )}__${bashCommands.indexOf(cmd)}`;
+
+      command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContainerName} bash -c '${cmd}'`;
+      commands.push(command);
       console.log(command);
       promises.push(execa(command));
     });
-  });
+
   return promises;
 }
 
@@ -140,6 +212,8 @@ function generateReport(config) {
       if (config.analyseReport) _analyseReport(config);
     });
 }
+
+
 
 function _analyseReport(config) {
   let mergedMochawesomeJSONPath = "";
@@ -170,13 +244,14 @@ function afterPromises(config, timer) {
   });
 }
 
-export function orchestrator(rawArgs) {
+export async function orchestrator(rawArgs) {
   let orchestratorTime = "orchestratorTime";
   let config = overWriteConfig(parseArgumentsIntoConfig(rawArgs));
 
   console.time(orchestratorTime);
   setEnvVars(config);
   execPreCommands(config);
+  
   Promise.all(upConrainters(config))
     .then(() => {
       afterPromises(config, orchestratorTime);
