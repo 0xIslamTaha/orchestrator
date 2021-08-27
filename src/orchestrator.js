@@ -65,7 +65,7 @@ function parseArgumentsIntoConfig(rawArgs) {
 
 function overWriteConfig(args) {
   let configFile = args["--config"] || path.resolve(__dirname, "config.json");
-  let config = JSON.parse(fs.readFileSync(configFile));
+  let config = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
   return { ...config, ...args };
 }
 
@@ -98,7 +98,7 @@ function getListOfSpecs(config, browser) {
     existingSpecs = sh.ls(config.specsHomePath);     
   }
 
-  let specsExecutionTime = JSON.parse(fs.readFileSync(config.specsExecutionTimePath));
+  let specsExecutionTime = JSON.parse(fs.readFileSync(config.specsExecutionTimePath, 'utf-8'));
   let browserSpecs = orderBasedOnBrowserDuration(specsExecutionTime, browser).map(item => item.specName);
   
   let specs = browserSpecs.filter(spec => existingSpecs.includes(spec));
