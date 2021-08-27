@@ -6,6 +6,7 @@ import fs from "fs";
 import arg from "arg";
 import path from "path";
 import { analyseReport } from "./analyseReport";
+import { checkFileIsExisting, parseJsonFile, orderBasedOnBrowserDuration } from './helper.js'
 
 function execa(command, flag = true) {
   return new Promise((resolve, reject) =>
@@ -81,14 +82,6 @@ function execPreCommands(config) {
   });
 }
 
-function orderBasedOnBrowserDuration(specs, browser) {
-  return specs.sort(function (a, b) {
-    let aDuration = a.data.find( item => item.browser === browser ).duration
-    let bDuration = b.data.find( item => item.browser === browser ).duration
-    return aDuration - bDuration;
-  });
-}
-
 function getListOfSpecs(config, browser) {
   let existingSpecs = [];
   
@@ -98,13 +91,18 @@ function getListOfSpecs(config, browser) {
     existingSpecs = sh.ls(config.specsHomePath);     
   }
 
-  let specsExecutionTime = JSON.parse(fs.readFileSync(config.specsExecutionTimePath, 'utf-8'));
-  let browserSpecs = orderBasedOnBrowserDuration(specsExecutionTime, browser).map(item => item.specName);
+  if (checkFileIsExisting(config.specsExecutionTimePath)) {
+    let specsExecutionTime = parseJsonFile(config.specsExecutionTimePath);
+    let browserSpecs = orderBasedOnBrowserDuration(specsExecutionTime, browser).map(item => item.specName);
+    
+    let specs = browserSpecs.filter(spec => existingSpecs.includes(spec));
+    specs = [...specs, ...existingSpecs.filter(item => !specs.includes(item))];
   
-  let specs = browserSpecs.filter(spec => existingSpecs.includes(spec));
-  specs = [...specs, ...existingSpecs.filter(item => !specs.includes(item))];
+    return specs;
+  } else {
+    return existingSpecs;
+  }
 
-  return specs;
 }
 
 function removeEmpty(arrays){
