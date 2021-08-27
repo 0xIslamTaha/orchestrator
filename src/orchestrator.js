@@ -107,6 +107,14 @@ function getListOfSpecs(config, browser) {
   return specs;
 }
 
+function removeEmpty(arrays){
+  let results = [];
+  arrays.forEach(array => {
+    if (array.length > 0) results.push(array.filter(item => item !== ""));
+  })
+  return results;
+}
+
 function splitSpecsOverMachines(specs, config) {
   let noOfMachines = config.parallelizm * config.browsers.length;
   let specsForMachines = [];
@@ -123,7 +131,7 @@ function splitSpecsOverMachines(specs, config) {
     _cycles++;
   }
 
-  return specsForMachines;
+  return removeEmpty(specsForMachines);
 }
 
 
@@ -156,11 +164,11 @@ function generateSpecsCommandsOverMachinesOrederedByBrowsers(config) {
 
 
 function _constructCypressCommands(config) {
-  let noOfMachines = config.parallelizm * config.browsers.length;
   let bashCommands = [];
   let specsCommandsOverMachinesOrederedByBrowsers = generateSpecsCommandsOverMachinesOrederedByBrowsers(config);
+  let _noOfMachines = specsCommandsOverMachinesOrederedByBrowsers[config.browsers[0]].length;
 
-  for (let i=0; i<noOfMachines; i++){
+  for (let i=0; i<_noOfMachines; i++){
     let bashCommand = "exit_code=0";
 
     let _browsers = i%2 ? config.browsers: config.browsers.reverse();
