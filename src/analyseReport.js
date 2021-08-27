@@ -51,6 +51,13 @@ function checkReportIsExisting(reportPath) {
   }
 }
 
+function millisToMinutesAndSeconds(millis) {
+  let minutes = Math.floor(millis / 60000);
+  let seconds = ((millis % 60000) / 1000).toFixed(0);
+  return `${minutes}:${(seconds < 10 ? '0' : '')}${ seconds}`;
+}
+
+
 export function analyseReport(reportPath) {
   console.log("analyse the json report .... ");
 
@@ -72,7 +79,7 @@ export function analyseReport(reportPath) {
       console.table(
         orderBasedOnBrowserDuration(browser).map(spec => { return {
           specName: spec.specName,
-          duration: spec.data.find( item => item.browser === browser ).duration
+          duration: millisToMinutesAndSeconds(spec.data.find( item => item.browser === browser ).duration)
         } })
       );
     }
