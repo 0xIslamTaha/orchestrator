@@ -124,6 +124,7 @@ function splitSpecsOverMachines(specs, config) {
   let _cycles = 0;
   while (specs.length > 0) {
     for (let i=0; i<noOfMachines; i++){
+      if (specs.length == 0) break;
       _cycles % 2 ? specsForMachines[i].push(specs.pop()) : specsForMachines[i].push(specs.shift());
     }
     _cycles++;
