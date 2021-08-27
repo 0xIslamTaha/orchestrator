@@ -163,7 +163,8 @@ function _constructCypressCommands(config) {
   for (let i=0; i<noOfMachines; i++){
     let bashCommand = "exit_code=0";
 
-    config.browsers.forEach((browser) => {
+    let _browsers = i%2 ? config.browsers: config.browsers.reverse();
+    _browsers.forEach((browser) => {
       bashCommand = `${bashCommand}; npx cypress run -b ${browser} --headless --spec ${specsCommandsOverMachinesOrederedByBrowsers[browser][i]} || exit_code=$? ; pkill -9 cypress`
     });
 
