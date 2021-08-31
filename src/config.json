@@ -13,7 +13,7 @@
   "specsDockerPath": "tests/cypress/storybook/",
   "cypressContainerName": "cypress_container",
   "mochawesomeJSONPath": "/opt/code/github/design-system/tests/report/mochawesome-report/*.json",
-  "reportPath": "./",
+  "reportPath": "mochawesome-report",
   "specs": [],
   "analyseReport": false,
   "specsExecutionTimePath": "tests/specExecutionTime.json"

@@ -1,6 +1,7 @@
 //@ts-check
 
 import fs from "fs";
+import path from "path";
 
 export function checkFileIsExisting(filePath) {
   if (fs.existsSync(filePath)) {
@@ -19,17 +20,21 @@ export function parseJsonFile(filePath) {
   }
 }
 
+export function writeJsonFile(data, outputDir, fileName) {
+  let _path = path.resolve(outputDir, fileName);
+  fs.writeFileSync(_path, JSON.stringify(data));
+}
+
 export function orderBasedOnBrowserDuration(specs, browser) {
-    return specs.sort(function (a, b) {
-      let aDuration = a.data.find( item => item.browser === browser ).duration
-      let bDuration = b.data.find( item => item.browser === browser ).duration
-      return aDuration - bDuration;
-    });
-  }
+  return specs.sort(function (a, b) {
+    let aDuration = a.data.find((item) => item.browser === browser).duration;
+    let bDuration = b.data.find((item) => item.browser === browser).duration;
+    return aDuration - bDuration;
+  });
+}
 
 export function millisToMinutesAndSeconds(millis) {
-    let minutes = Math.floor(millis / 60000);
-    let seconds = ((millis % 60000) / 1000).toFixed(0);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  }
-  
+  let minutes = Math.floor(millis / 60000);
+  let seconds = ((millis % 60000) / 1000).toFixed(0);
+  return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+}

@@ -1,4 +1,11 @@
-import { checkFileIsExisting, orderBasedOnBrowserDuration, millisToMinutesAndSeconds } from "./helper.js";
+//@ts-check
+
+import {
+  checkFileIsExisting,
+  orderBasedOnBrowserDuration,
+  millisToMinutesAndSeconds,
+  writeJsonFile,
+} from "./helper.js";
 
 const browsers = ["chrome", "firefox"];
 const defaultBrowser = "chrome"; // I will use it in case of there is no browser in the title.
@@ -33,13 +40,14 @@ function updateSpecData(suites, specName) {
   });
 }
 
-export function analyseReport(reportPath) {
+export function analyseReport(mochaReportPath) {
   console.log("analyse the json report .... ");
 
-  if (checkFileIsExisting(reportPath)) {
-    const report = require(reportPath);
+  if (checkFileIsExisting(mochaReportPath)) {
+    const reportDir = mochaReportPath.substring(0, mochaReportPath.lastIndexOf("/"));
+    const report = require(mochaReportPath);
 
-    report["results"].forEach(function (result) {
+    report["results"].forEach( result => {
       let specFile = result["file"].split("/").pop();
       let suites = result["suites"];
 
@@ -51,16 +59,16 @@ export function analyseReport(reportPath) {
       console.log(
         `------------------------- ${browser} -------------------------`
       );
-      console.table(
-        orderBasedOnBrowserDuration(specs, browser).map((spec) => {
-          return {
-            specName: spec.specName,
-            duration: millisToMinutesAndSeconds(
-              spec.data.find((item) => item.browser === browser).duration
-            ),
-          };
-        })
-      );
+      let data = orderBasedOnBrowserDuration(specs, browser).map((spec) => {
+        return {
+          specName: spec.specName,
+          duration: millisToMinutesAndSeconds(
+            spec.data.find((item) => item.browser === browser).duration
+          ),
+        };
+      });
+      writeJsonFile(data, reportDir, `SpecsExecutionTime-${browser}.json`);
+      console.table(data);
     }
   }
 }
