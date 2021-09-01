@@ -90,7 +90,7 @@ function getListOfSpecs(config, browser) {
   let existingSpecs = [];
 
   if (config.specs.length > 0) {
-    existingSpecs = config.specs.map((item) => item.replaceAll('"', ""));
+    existingSpecs = config.specs.map((item) => item.replace(/"/g, ""));
   } else {
     existingSpecs = sh.ls(config.specsHomePath);
   }
