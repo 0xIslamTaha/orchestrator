@@ -6,7 +6,11 @@ import fs from "fs";
 import arg from "arg";
 import path from "path";
 import { analyseReport } from "./analyseReport";
-import { checkFileIsExisting, parseJsonFile, orderBasedOnBrowserDuration } from './helper.js'
+import {
+  checkFileIsExisting,
+  parseJsonFile,
+  orderBasedOnBrowserDuration,
+} from "./helper.js";
 
 function execa(command, flag = true) {
   return new Promise((resolve, reject) =>
@@ -66,7 +70,7 @@ function parseArgumentsIntoConfig(rawArgs) {
 
 function overWriteConfig(args) {
   let configFile = args["--config"] || path.resolve(__dirname, "config.json");
-  let config = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
+  let config = JSON.parse(fs.readFileSync(configFile, "utf-8"));
   return { ...config, ...args };
 }
 
@@ -84,48 +88,55 @@ function execPreCommands(config) {
 
 function getListOfSpecs(config, browser) {
   let existingSpecs = [];
-  
+
   if (config.specs.length > 0) {
-    existingSpecs = config.specs;
+    existingSpecs = config.specs.map((item) => item.replaceAll('"', ""));
   } else {
-    existingSpecs = sh.ls(config.specsHomePath);     
+    existingSpecs = sh.ls(config.specsHomePath);
   }
 
   if (checkFileIsExisting(config.specsExecutionTimePath)) {
     let specsExecutionTime = parseJsonFile(config.specsExecutionTimePath);
-    let browserSpecs = orderBasedOnBrowserDuration(specsExecutionTime, browser).map(item => item.specName);
-    
-    let specs = browserSpecs.filter(spec => existingSpecs.includes(spec));
-    specs = [...specs, ...existingSpecs.filter(item => !specs.includes(item))];
-  
+    let browserSpecs = orderBasedOnBrowserDuration(
+      specsExecutionTime,
+      browser
+    ).map((item) => item.specName);
+
+    let specs = browserSpecs.filter((spec) => existingSpecs.includes(spec));
+    specs = [
+      ...specs,
+      ...existingSpecs.filter((item) => !specs.includes(item)),
+    ];
+
     return specs;
   } else {
     return existingSpecs;
   }
-
 }
 
-function removeEmpty(arrays){
+function removeEmpty(arrays) {
   let results = [];
-  arrays.forEach(array => {
-    if (array.length > 0) results.push(array.filter(item => item !== ""));
-  })
+  arrays.forEach((array) => {
+    if (array.length > 0) results.push(array.filter((item) => item !== ""));
+  });
   return results;
 }
 
 function splitSpecsOverMachines(specs, config) {
   let noOfMachines = config.parallelizm * config.browsers.length;
   let specsForMachines = [];
-  
-  for (let i=0; i<noOfMachines; i++){
+
+  for (let i = 0; i < noOfMachines; i++) {
     specsForMachines.push([]); // [ [], [], [] ..]
   }
 
   let _cycles = 0;
   while (specs.length > 0) {
-    for (let i=0; i<noOfMachines; i++){
+    for (let i = 0; i < noOfMachines; i++) {
       if (specs.length == 0) break;
-      _cycles % 2 ? specsForMachines[i].push(specs.pop()) : specsForMachines[i].push(specs.shift());
+      _cycles % 2
+        ? specsForMachines[i].push(specs.pop())
+        : specsForMachines[i].push(specs.shift());
     }
     _cycles++;
   }
@@ -133,10 +144,9 @@ function splitSpecsOverMachines(specs, config) {
   return removeEmpty(specsForMachines);
 }
 
-
 function genearateSpecsCommandsForMachines(config, browser) {
-  let specsCommandsOverMachines = [];  
-  
+  let specsCommandsOverMachines = [];
+
   let specs = getListOfSpecs(config, browser);
   let listOfSpecsOverMachines = splitSpecsOverMachines(specs, config);
 
@@ -147,7 +157,7 @@ function genearateSpecsCommandsForMachines(config, browser) {
     });
     specsCommandsOverMachines.push(result.slice(1));
   });
-  
+
   return specsCommandsOverMachines;
 }
 
@@ -155,24 +165,26 @@ function generateSpecsCommandsOverMachinesOrederedByBrowsers(config) {
   let specsCommandsOverMachinesOrederedByBrowsers = {}; // {'chrome': [ [] , [] , []], 'firefox': [[], [], []]}
 
   config.browsers.forEach((browser) => {
-    specsCommandsOverMachinesOrederedByBrowsers[browser] = genearateSpecsCommandsForMachines(config, browser);
+    specsCommandsOverMachinesOrederedByBrowsers[browser] =
+      genearateSpecsCommandsForMachines(config, browser);
   });
 
   return specsCommandsOverMachinesOrederedByBrowsers;
 }
 
-
 function _constructCypressCommands(config) {
   let bashCommands = [];
-  let specsCommandsOverMachinesOrederedByBrowsers = generateSpecsCommandsOverMachinesOrederedByBrowsers(config);
-  let _noOfMachines = specsCommandsOverMachinesOrederedByBrowsers[config.browsers[0]].length;
+  let specsCommandsOverMachinesOrederedByBrowsers =
+    generateSpecsCommandsOverMachinesOrederedByBrowsers(config);
+  let _noOfMachines =
+    specsCommandsOverMachinesOrederedByBrowsers[config.browsers[0]].length;
 
-  for (let i=0; i<_noOfMachines; i++){
+  for (let i = 0; i < _noOfMachines; i++) {
     let bashCommand = "exit_code=0";
 
-    let _browsers = i%2 ? config.browsers: config.browsers.reverse();
+    let _browsers = i % 2 ? config.browsers : config.browsers.reverse();
     _browsers.forEach((browser) => {
-      bashCommand = `${bashCommand}; npx cypress run -b ${browser} --headless --spec ${specsCommandsOverMachinesOrederedByBrowsers[browser][i]} || exit_code=$? ; pkill -9 cypress`
+      bashCommand = `${bashCommand}; npx cypress run -b ${browser} --headless --spec ${specsCommandsOverMachinesOrederedByBrowsers[browser][i]} || exit_code=$? ; pkill -9 cypress`;
     });
 
     bashCommand = `${bashCommand} ; exit $exit_code`;
@@ -188,15 +200,15 @@ function upConrainters(config) {
   let bashCommands = _constructCypressCommands(config);
 
   bashCommands.forEach((cmd) => {
-      container_name = `container_${Math.floor(
-        Math.random() * 100000
-      )}__${bashCommands.indexOf(cmd)}`;
+    container_name = `container_${Math.floor(
+      Math.random() * 100000
+    )}__${bashCommands.indexOf(cmd)}`;
 
-      command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContainerName} bash -c '${cmd}'`;
-      commands.push(command);
-      console.log(command);
-      promises.push(execa(command));
-    });
+    command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContainerName} bash -c '${cmd}'`;
+    commands.push(command);
+    console.log(command);
+    promises.push(execa(command));
+  });
 
   return promises;
 }
@@ -220,8 +232,6 @@ function generateReport(config) {
       if (config.analyseReport) _analyseReport(config);
     });
 }
-
-
 
 function _analyseReport(config) {
   let mergedMochawesomeJSONPath = "";
@@ -259,7 +269,7 @@ export async function orchestrator(rawArgs) {
   console.time(orchestratorTime);
   setEnvVars(config);
   execPreCommands(config);
-  
+
   Promise.all(upConrainters(config))
     .then(() => {
       afterPromises(config, orchestratorTime);
