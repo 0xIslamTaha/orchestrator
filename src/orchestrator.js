@@ -61,6 +61,8 @@ function parseArgumentsIntoConfig(rawArgs) {
         .replace("[", "")
         .replace("]", "")
         .replace(", ", ",")
+        .replace(/"/g, "")
+        .replace(/'/g, "")
         .split(",");
     }
     result[key] = variable;
@@ -90,7 +92,7 @@ function getListOfSpecs(config, browser) {
   let existingSpecs = [];
 
   if (config.specs.length > 0) {
-    existingSpecs = config.specs.map((item) => item.replace(/"/g, ""));
+    existingSpecs = config.specs
   } else {
     existingSpecs = sh.ls(config.specsHomePath);
   }

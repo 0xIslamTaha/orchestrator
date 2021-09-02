@@ -67,7 +67,7 @@ export function analyseReport(mochaReportPath) {
           ),
         };
       });
-      writeJsonFile(data, reportDir, `SpecsExecutionTime-${browser}.json`);
+      writeJsonFile(data, reportDir, `specsExecutionTime-${browser}.json`);
       console.table(data);
     }
   }
