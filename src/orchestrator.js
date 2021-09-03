@@ -61,8 +61,7 @@ function parseArgumentsIntoConfig(rawArgs) {
         .replace("[", "")
         .replace("]", "")
         .replace(", ", ",")
-        .replace(/"/g, "")
-        .replace(/'/g, "")
+        .replace(/"|'/g, "")
         .split(",");
     }
     result[key] = variable;
@@ -71,8 +70,8 @@ function parseArgumentsIntoConfig(rawArgs) {
 }
 
 function overWriteConfig(args) {
-  let configFile = args["--config"] || path.resolve(__dirname, "config.json");
-  let config = JSON.parse(fs.readFileSync(configFile, "utf-8"));
+  const configFile = args["--config"] || path.resolve(__dirname, "config.json");
+  const config = JSON.parse(fs.readFileSync(configFile, "utf-8"));
   return { ...config, ...args };
 }
 

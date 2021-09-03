@@ -6,13 +6,15 @@ import {
   millisToMinutesAndSeconds,
   writeJsonFile,
 } from "./helper.js";
+import path from "path";
+
 
 const browsers = ["chrome", "firefox"];
 const defaultBrowser = "chrome"; // I will use it in case of there is no browser in the title.
 const specs = [];
 
 function getBrowserFromTitle(title) {
-  return browsers.find((browser) => title.toLowerCase().includes(browser));
+  return browsers.find((browser) => title.toLowerCase() === browser);
 }
 
 function intiateSpecData(specName) {
@@ -44,7 +46,7 @@ export function analyseReport(mochaReportPath) {
   console.log("analyse the json report .... ");
 
   if (checkFileIsExisting(mochaReportPath)) {
-    const reportDir = mochaReportPath.substring(0, mochaReportPath.lastIndexOf("/"));
+    const reportDir = path.dirname(mochaReportPath);
     const report = require(mochaReportPath);
 
     report["results"].forEach( result => {
