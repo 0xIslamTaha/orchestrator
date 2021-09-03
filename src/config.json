@@ -16,5 +16,5 @@
   "reportPath": "mochawesome-report",
   "specs": [],
   "analyseReport": false,
-  "specsExecutionTimePath": "tests/specExecutionTime.json"
+  "specsExecutionTimePath": "mochawesome-report/specsExecutionTime-chrome.json"
 }
