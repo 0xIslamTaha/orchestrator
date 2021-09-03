@@ -21,8 +21,7 @@ export function parseJsonFile(filePath) {
 }
 
 export function writeJsonFile(data, outputDir, fileName) {
-  let _path = path.resolve(outputDir, fileName);
-  fs.writeFileSync(_path, JSON.stringify(data));
+  fs.writeFileSync(path.resolve(outputDir, fileName), JSON.stringify(data));
 }
 
 export function orderBasedOnBrowserDuration(specs, browser) {
@@ -34,7 +33,7 @@ export function orderBasedOnBrowserDuration(specs, browser) {
 }
 
 export function millisToMinutesAndSeconds(millis) {
-  let minutes = Math.floor(millis / 60000);
-  let seconds = ((millis % 60000) / 1000).toFixed(0);
+  const minutes = Math.floor(millis / 60000);
+  const seconds = ((millis % 60000) / 1000).toFixed(0);
   return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 }
