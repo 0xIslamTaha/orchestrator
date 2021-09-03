@@ -9,48 +9,35 @@ Orchestrator executes all cypress specs across n parallel docker containers base
 2- [Cypress parallelization with the Orchestrator — part 2 — ShowCase](https://0xislamtaha.medium.com/cypress-parallelization-with-the-orchestrator-part-2-showcase-c78202b17c7a)
 
 ## 😍 Usecases:
+Check the following repo as a public use case.
 - [Orchestrator-Public-Use-Case](https://github.com/0xIslamTaha/orchestrator-public-use-case)
 
 ## ♟️ Orchestrator mechanism:
 
-* Pares a config file 
-* Create n containers machines  in parallel
-* Split all specs across all those machines 
-* Collect all the execution results from those containers 
-* Down all the running containers
-* Generate one HTML report that has all specs execution results
+* Pares a config file.
+* Create (config.parallelizm * config.browsers.length) containers in parallel.
+* Split all specs across all those machines based on their execution time.
+* Collect all the execution results from those containers.
+* Down all the running containers.
+* Generate one HTML report that has all specs execution results.
+* Analyse the execution time for each spec.
+* If you fed the orchestrator with this execution time JSON file, It will split the test cases based on that.
 
-## Features:
-- Create n chrome containers and/or n firefox containers
-- Split the spcecs accross those continers
-- Manage the results
-- Generate HTML report
+## 🏹 The Splitting mechanism:
+The orchestrator can measure and report the execution time for each spec per browser. It will report it as `mochawesome-report/specsExecutionTime-chrome.json` file. If you provided this path as `specsExecutionTimePath`  in the next run, The orchestrator will split the specs based on its execution time to minimize the total execution time 🚀. 
 
 ## 👌 Installation:
-
+* Install from npm
 ```bash
 npm -g install 0xislamtaha/orchestrator
 ```
 
-## 🎮 Usage:
-
-* With the default configuration file i.e, "src/config.json"
+* Install from Github branch
 ```bash
-orchestrator
+npm -g install @0xislamtaha/orchestrator:development
 ```
 
-* With your configuration file
-```bash
-orchestrator --config "/path/to/config.json"
-```
-
-If you need to **overwrite** any configuration on the fly, simplly path the new configuration as a prameter.
-```bash
-orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]"
-```
-
-
-## 🔑 Requirements to use orchrestrator:
+## 🔑 Requirements to use orchestrator:
 1- docker-compose file with a cypress service. here is an example of it.
 
 ```yml
@@ -58,14 +45,14 @@ orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_
 version: '3.8'
 services:
   cypress-container:
-    build: ./
+    image: 0xislamtaha/cypress-snapshot-image:latest
     network_mode: "bridge"
     volumes:
-      - ./cypress/:/orechestrator_usecase/cypress
-      - ./mochawesome-report:/orechestrator_usecase/mochawesome-report
+      - ./cypress/:/cypress_testing/cypress
+      - ./mochawesome-report:/cypress_testing/mochawesome-report
       - /dev/shm:/dev/shm
 ```
-2- use mochawsome as a reporter in cypress.json, just add the following snippet to your cypress.json.
+2- use mochawesome as a reporter in cypress.json, just add the following snippet to your cypress.json.
 
 ```json
 {
@@ -142,10 +129,31 @@ services:
     type: array
     example: ["test.js", "test2.js"]
 
+- analyseReport:
+    description: boolen value to generate an execution time report. 
+    type: boolen
+    example: true
+
+- specsExecutionTimePath:
+    description: path to the execution time file.
+    type: string
+    example: "mochawesome-report/specsExecutionTime-chrome.json"
+
+```
+
+## 🎮 Usage:
+
+* With your configuration file
+```bash
+npx orchestrator --config "/path/to/config.json"
+```
+
+* You can **overwrite** any configuration param on the fly, simplly path the new configuration as a prameter.
+```bash
+npx orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]" --specs "[alerts.js, avatar.js]"
 ```
 
 ## 🎬 To-Do:
-* Export COMPOSE_PROJECT_NAME with random value if it doesnt exist.
-* Print the commands.
-* list configuration rather than multiple files.
+* Export COMPOSE_PROJECT_NAME with random value if it doesn't exist.
+* list configuration rather than multiple files for multiple test suites.
 * Provide --help option.
