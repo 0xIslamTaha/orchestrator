@@ -93,7 +93,7 @@ function getListOfSpecs(config, browser) {
   if (config.specs.length > 0) {
     existingSpecs = config.specs
   } else {
-    existingSpecs = sh.ls(config.specsHomePath);
+    existingSpecs = sh.ls('-R', config.specsHomePath).filter((val) => val.match(/.*ts|js/));
   }
 
   if (checkFileIsExisting(config.specsExecutionTimePath)) {
