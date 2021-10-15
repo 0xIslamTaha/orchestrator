@@ -71,8 +71,9 @@ function parseArgumentsIntoConfig(rawArgs) {
 
 function overWriteConfig(args) {
   const configFile = args["--config"] || path.resolve(__dirname, "config.json");
-  const config = JSON.parse(fs.readFileSync(configFile, "utf-8"));
-  return { ...config, ...args };
+  const defaultConfig = JSON.parse(fs.readFileSync(configFile, "utf-8"));
+  const config = { ...defaultConfig, ...args };
+  return config;
 }
 
 function setEnvVars(config) {
@@ -154,7 +155,8 @@ function genearateSpecsCommandsForMachines(config, browser) {
   listOfSpecsOverMachines.forEach((listOfspecsPerMachine) => {
     let result = "";
     listOfspecsPerMachine.forEach((spec) => {
-      result = `${result},${config.specsDockerPath}${spec}`;
+      let specPath = path.join(config.specsDockerPath, spec);
+      result = `${result},${specPath}`;
     });
     specsCommandsOverMachines.push(result.slice(1));
   });
