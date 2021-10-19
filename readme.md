@@ -29,6 +29,11 @@ Check the following repo as a public use case.
 ## 🏹 The Splitting mechanism:
 The orchestrator can measure and report the execution time for each spec per browser. It will report it as `mochawesome-report/specsExecutionTime-chrome.json` file. If you provided this path as `specsExecutionTimePath`  in the next run, The orchestrator will split the specs based on its execution time to minimize the total execution time 🚀. 
 
+## ⌨️ Operating Systems:
+- Linux: working out of the box.
+- MacOS: please exeucte `brew install coreutils` command.
+- We are not supporting Windows yet.
+
 ## 👌 Installation:
 * Install from npm
 ```bash
