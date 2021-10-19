@@ -12,6 +12,11 @@ import {
   orderBasedOnBrowserDuration,
 } from "./helper.js";
 
+const executionTimeReportDir = "executionTimeReprot";
+const executionTimeReportDirPath = path.resolve(process.cwd(), executionTimeReportDir)
+const executiontimeReportJson = "specsExecutionTime.json"
+const executiontimeReportJsonPath = path.join(executionTimeReportDirPath, executiontimeReportJson)
+
 function execa(command, flag = true) {
   return new Promise((resolve, reject) =>
     sh.exec(command, function (code, stdout, stderr) {
@@ -92,13 +97,13 @@ function getListOfSpecs(config, browser) {
   let existingSpecs = [];
 
   if (config.specs.length > 0) {
-    existingSpecs = config.specs
+    existingSpecs = [...config.specs];
   } else {
     existingSpecs = sh.ls('-R', config.specsHomePath).filter((val) => val.match(/.*ts|js/));
   }
 
-  if (checkFileIsExisting(config.specsExecutionTimePath)) {
-    let specsExecutionTime = parseJsonFile(config.specsExecutionTimePath);
+  if (checkFileIsExisting(executiontimeReportJsonPath)) {
+    let specsExecutionTime = parseJsonFile(executiontimeReportJsonPath);
     let browserSpecs = orderBasedOnBrowserDuration(
       specsExecutionTime,
       browser
@@ -232,7 +237,12 @@ function generateReport(config) {
       })
     )
     .then(() => {
-      if (config.analyseReport) _analyseReport(config);
+      if (config.analyseReport) {
+        if (!fs.existsSync(executionTimeReportDirPath)){
+          sh.mkdir(executionTimeReportDirPath);
+        }
+        _analyseReport(config);
+      }
     });
 }
 
@@ -251,7 +261,7 @@ function _analyseReport(config) {
     );
   }
 
-  analyseReport(mergedMochawesomeJSONPath);
+  analyseReport(mergedMochawesomeJSONPath, executiontimeReportJsonPath);
 }
 
 function afterPromises(config, timer) {
