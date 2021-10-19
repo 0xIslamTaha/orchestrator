@@ -22,7 +22,7 @@ Check the following repo as a public use case.
 * Down all the running containers.
 * Generate one HTML report that has all specs execution results.
 * Analyse the execution time for each spec.
-* Generate the exection time reports per browser under ExecutionTimeReport dir.
+* Generate the execution time reports per browser under ExecutionTimeReport dir.
 * In the next run, The orchestrator It will split the test cases based on this execution time report to reduce the exeuction time.
 
 
@@ -155,7 +155,7 @@ npx orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOC
 
 The orchestrator generates two reports by default:
 - The HTML report under the `mochawesome-report` dir.
-- The exectutiion time reports per browser und `ExecutionTimeReport` dir.
+- The execution time reports per browser und `ExecutionTimeReport` dir.
 
 
 ## 🎬 To-Do:
