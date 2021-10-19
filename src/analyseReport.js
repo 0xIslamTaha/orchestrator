@@ -42,11 +42,12 @@ function updateSpecData(suites, specName) {
   });
 }
 
-export function analyseReport(mochaReportPath) {
+export function analyseReport(mochaReportPath, executiontimeReportJsonPath) {
   console.log("analyse the json report .... ");
 
   if (checkFileIsExisting(mochaReportPath)) {
-    const reportDir = path.dirname(mochaReportPath);
+    const executionTimeReportDir = path.dirname(executiontimeReportJsonPath);
+    const executionTimeReporJson = executiontimeReportJsonPath.split("/").pop();
     const report = require(mochaReportPath);
 
     report["results"].forEach( result => {
@@ -57,10 +58,12 @@ export function analyseReport(mochaReportPath) {
       updateSpecData(suites, specFile);
     });
 
+    writeJsonFile(specs, executionTimeReportDir, executionTimeReporJson);
+
     for (let browser of browsers) {
       console.log(
         `------------------------- ${browser} -------------------------`
-      );
+      ); 
       let data = orderBasedOnBrowserDuration(specs, browser).map((spec) => {
         return {
           specName: spec.specName,
@@ -69,7 +72,7 @@ export function analyseReport(mochaReportPath) {
           ),
         };
       });
-      writeJsonFile(data, reportDir, `specsExecutionTime-${browser}.json`);
+      writeJsonFile(data, executionTimeReportDir, `${executionTimeReporJson.split('.')[0]}-${browser}.json`);
       console.table(data);
     }
   }

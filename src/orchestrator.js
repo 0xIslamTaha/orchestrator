@@ -12,6 +12,11 @@ import {
   orderBasedOnBrowserDuration,
 } from "./helper.js";
 
+const executionTimeReportDir = "executionTimeReprot";
+const executionTimeReportDirPath = path.resolve(process.cwd(), executionTimeReportDir)
+const executiontimeReportJson = "specsExecutionTime.json"
+const executiontimeReportJsonPath = path.join(executionTimeReportDirPath, executiontimeReportJson)
+
 function execa(command, flag = true) {
   return new Promise((resolve, reject) =>
     sh.exec(command, function (code, stdout, stderr) {
@@ -71,8 +76,9 @@ function parseArgumentsIntoConfig(rawArgs) {
 
 function overWriteConfig(args) {
   const configFile = args["--config"] || path.resolve(__dirname, "config.json");
-  const config = JSON.parse(fs.readFileSync(configFile, "utf-8"));
-  return { ...config, ...args };
+  const defaultConfig = JSON.parse(fs.readFileSync(configFile, "utf-8"));
+  const config = { ...defaultConfig, ...args };
+  return config;
 }
 
 function setEnvVars(config) {
@@ -91,13 +97,13 @@ function getListOfSpecs(config, browser) {
   let existingSpecs = [];
 
   if (config.specs.length > 0) {
-    existingSpecs = config.specs
+    existingSpecs = [...config.specs];
   } else {
     existingSpecs = sh.ls('-R', config.specsHomePath).filter((val) => val.match(/.*ts|js/));
   }
 
-  if (checkFileIsExisting(config.specsExecutionTimePath)) {
-    let specsExecutionTime = parseJsonFile(config.specsExecutionTimePath);
+  if (checkFileIsExisting(executiontimeReportJsonPath)) {
+    let specsExecutionTime = parseJsonFile(executiontimeReportJsonPath);
     let browserSpecs = orderBasedOnBrowserDuration(
       specsExecutionTime,
       browser
@@ -154,7 +160,8 @@ function genearateSpecsCommandsForMachines(config, browser) {
   listOfSpecsOverMachines.forEach((listOfspecsPerMachine) => {
     let result = "";
     listOfspecsPerMachine.forEach((spec) => {
-      result = `${result},${config.specsDockerPath}${spec}`;
+      let specPath = path.join(config.specsDockerPath, spec);
+      result = `${result},${specPath}`;
     });
     specsCommandsOverMachines.push(result.slice(1));
   });
@@ -230,7 +237,12 @@ function generateReport(config) {
       })
     )
     .then(() => {
-      if (config.analyseReport) _analyseReport(config);
+      if (config.analyseReport) {
+        if (!fs.existsSync(executionTimeReportDirPath)){
+          sh.mkdir(executionTimeReportDirPath);
+        }
+        _analyseReport(config);
+      }
     });
 }
 
@@ -249,7 +261,7 @@ function _analyseReport(config) {
     );
   }
 
-  analyseReport(mergedMochawesomeJSONPath);
+  analyseReport(mergedMochawesomeJSONPath, executiontimeReportJsonPath);
 }
 
 function afterPromises(config, timer) {
