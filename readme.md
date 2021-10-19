@@ -16,12 +16,15 @@ Check the following repo as a public use case.
 
 * Pares a config file.
 * Create (config.parallelizm * config.browsers.length) containers in parallel.
-* Split all specs across all those machines based on their execution time.
-* Collect all the execution results from those containers.
+* Recursively list all the specs files 
+* Split all the specs across all those machines based on their execution time.
+* Collect all the execution json reports from those containers.
 * Down all the running containers.
 * Generate one HTML report that has all specs execution results.
 * Analyse the execution time for each spec.
-* If you fed the orchestrator with this execution time JSON file, It will split the test cases based on that.
+* Generate the exection time reports per browser under ExecutionTimeReport dir.
+* In the next run, The orchestrator It will split the test cases based on this execution time report to reduce the exeuction time.
+
 
 ## 🏹 The Splitting mechanism:
 The orchestrator can measure and report the execution time for each spec per browser. It will report it as `mochawesome-report/specsExecutionTime-chrome.json` file. If you provided this path as `specsExecutionTimePath`  in the next run, The orchestrator will split the specs based on its execution time to minimize the total execution time 🚀. 
@@ -134,11 +137,6 @@ services:
     type: boolen
     example: true
 
-- specsExecutionTimePath:
-    description: path to the execution time file.
-    type: string
-    example: "mochawesome-report/specsExecutionTime-chrome.json"
-
 ```
 
 ## 🎮 Usage:
@@ -152,6 +150,13 @@ npx orchestrator --config "/path/to/config.json"
 ```bash
 npx orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]" --specs "[alerts.js, avatar.js]"
 ```
+
+## 📖 Reports: 
+
+The orchestrator generates two reports by default:
+- The HTML report under the `mochawesome-report` dir.
+- The exectutiion time reports per browser und `ExecutionTimeReport` dir.
+
 
 ## 🎬 To-Do:
 * Export COMPOSE_PROJECT_NAME with random value if it doesn't exist.
