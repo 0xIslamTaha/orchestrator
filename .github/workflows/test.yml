@@ -15,15 +15,10 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-
-      - name: clone the orchestrator public use case
+          
+      - name: 🚀 Exeucte the test cases
         run: |
           git clone https://github.com/0xIslamTaha/orchestrator-public-use-case.git
-
-      - name: ☘️ Install the requirements
-        run: |
           cd orchestrator-public-use-case
           npm i
-
-      - name: 🚀 Exeucte the test cases
-        run: npx orchestrator --config orchestrator.json
+          npx orchestrator --config orchestrator.json
