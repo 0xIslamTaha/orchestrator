@@ -19,10 +19,11 @@ jobs:
       - name: clone the orchestrator public use case
         run: |
           git clone https://github.com/0xIslamTaha/orchestrator-public-use-case.git
-          cd orchestrator-public-use-case
 
       - name: ☘️ Install the requirements
-        run: npm i
+        run: |
+          cd orchestrator-public-use-case
+          npm i
 
       - name: 🚀 Exeucte the test cases
         run: npx orchestrator --config orchestrator.json
