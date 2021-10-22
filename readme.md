@@ -37,12 +37,12 @@ The orchestrator can measure and report the execution time for each spec per bro
 ## 👌 Installation:
 * Install from npm
 ```bash
-npm -g install 0xislamtaha/orchestrator
+npm -g install @0xislamtaha/orchestrator
 ```
 
 * Install from Github branch
 ```bash
-npm -g install @0xislamtaha/orchestrator:development
+npm -g install 0xislamtaha/orchestrator
 ```
 
 ## 🔑 Requirements to use orchestrator:
