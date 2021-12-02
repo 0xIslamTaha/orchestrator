@@ -283,12 +283,12 @@ export async function orchestrator(rawArgs) {
   setEnvVars(config);
   execPreCommands(config);
 
-  Promise.all(upConrainters(config))
-    .then(() => {
+  Promise.allSettled(upConrainters(config))
+    .then(promises => {
       afterPromises(config, orchestratorTime);
-    })
-    .catch((exitCode) => {
-      afterPromises(config, orchestratorTime);
-      setTimeout(() => sh.exit(exitCode), 5000);
+      const failedPromises = promises.filter(promise => promise.status === 'rejected');
+      if(failedPromises.length > 0){
+          setTimeout(() => sh.exit(failedPromises.map(failedPromise => failedPromise.reason).join(";")), 5000);
+      }
     });
 }
