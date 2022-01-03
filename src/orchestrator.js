@@ -287,8 +287,8 @@ export async function orchestrator(rawArgs) {
     .then(promises => {
       afterPromises(config, orchestratorTime);
       const failedPromises = promises.filter(promise => promise.status === 'rejected');
-      if(failedPromises.length > 0){
-          setTimeout(() => sh.exit(2), 5000);
+      if(failedPromises.length){
+          setTimeout(() => sh.exit(1), 5000);
       }
     });
 }
