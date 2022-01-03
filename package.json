@@ -1,6 +1,6 @@
 {
   "name": "@0xislamtaha/orchestrator",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "orchestrate cypress parallel execution across multiple Docker containers",
   "main": "src/orchestrator.js",
   "scripts": {
