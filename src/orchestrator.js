@@ -11,8 +11,9 @@ import {
   parseJsonFile,
   orderBasedOnBrowserDuration,
 } from "./helper.js";
-
 import * as lg from "./logger";
+import { checkRequirements  } from "./checker";
+
 
 const executionTimeReportDir = "executionTimeReprot";
 const executionTimeReportDirPath = path.resolve(process.cwd(), executionTimeReportDir)
@@ -77,7 +78,7 @@ function parseArgumentsIntoConfig(rawArgs) {
 }
 
 function overWriteConfig(args) {
-  lg.step('Overwrite the config file with the arguments if there is any');
+  lg.step('Overwrite the config file with the arguments if there is any', true);
   const configFile = args["--config"] || path.resolve(__dirname, "config.json");
   const defaultConfig = JSON.parse(fs.readFileSync(configFile, "utf-8"));
   const config = { ...defaultConfig, ...args };
@@ -286,6 +287,7 @@ function afterPromises(config, timer) {
 
 export async function orchestrator(rawArgs) {
   lg.banner();
+  checkRequirements();
 
   let orchestratorTime = "\n[*] Total execution time";
   let config = overWriteConfig(parseArgumentsIntoConfig(rawArgs));
