@@ -12,6 +12,8 @@ import {
   orderBasedOnBrowserDuration,
 } from "./helper.js";
 
+import * as lg from "./logger";
+
 const executionTimeReportDir = "executionTimeReprot";
 const executionTimeReportDirPath = path.resolve(process.cwd(), executionTimeReportDir)
 const executiontimeReportJson = "specsExecutionTime.json"
@@ -75,6 +77,7 @@ function parseArgumentsIntoConfig(rawArgs) {
 }
 
 function overWriteConfig(args) {
+  lg.step('Overwrite the config file with the arguments if there is any');
   const configFile = args["--config"] || path.resolve(__dirname, "config.json");
   const defaultConfig = JSON.parse(fs.readFileSync(configFile, "utf-8"));
   const config = { ...defaultConfig, ...args };
@@ -82,13 +85,18 @@ function overWriteConfig(args) {
 }
 
 function setEnvVars(config) {
+  lg.step("Export the environment variables");
   Object.keys(config.environment).forEach((key) => {
-    sh.env[key] = config.environment[key];
+    let value = config.environment[key];
+    sh.env[key] = value;
+    lg.subStep(`${key}=${value}`);
   });
 }
 
 function execPreCommands(config) {
+  lg.step("Execute the pre commands", true);
   config.preCommands.forEach((command) => {
+    lg.subStep(`~$ ${command}`);
     sh.exec(command);
   });
 }
@@ -202,6 +210,7 @@ function _constructCypressCommands(config) {
 }
 
 function upConrainters(config) {
+  lg.step("Start the cypress containers", true);
   let promises = [];
   let commands = [];
   let [container_name, command] = ["", ""];
@@ -214,7 +223,7 @@ function upConrainters(config) {
 
     command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContainerName} bash -c '${cmd}'`;
     commands.push(command);
-    console.log(command);
+    lg.subStep(`~$ ${command}`);
     promises.push(execa(command));
   });
 
@@ -222,25 +231,29 @@ function upConrainters(config) {
 }
 
 function downContainers(config) {
+  lg.step("Stop the cypress containers", true);
   let dockerComposeDown = `docker-compose -f ${config.dockerComposePath} down`;
   sh.exec(dockerComposeDown);
 }
 
 function generateReport(config) {
-  console.log("generate the report ....");
+  lg.step("Generate the reports", true);
   return merge({ files: [config.mochawesomeJSONPath] })
-    .then((report) =>
+    .then((report) =>{
+      lg.subStep(`HTML report: ${config.reportPath}/mochawsome.html`);
       marge.create(report, {
         reportDir: config.reportPath,
         charts: true,
         saveJson: true,
       })
-    )
+
+    })
     .then(() => {
       if (config.analyseReport) {
         if (!fs.existsSync(executionTimeReportDirPath)){
           sh.mkdir(executionTimeReportDirPath);
         }
+        lg.subStep(`Execution time report: ${executionTimeReportDir}/${executiontimeReportJson}`);
         _analyseReport(config);
       }
     });
@@ -267,16 +280,14 @@ function _analyseReport(config) {
 function afterPromises(config, timer) {
   downContainers(config);
   generateReport(config).then(() => {
-    console.log(
-      `\b------------------------- Exeuction Time -------------------------`
-    );
-    console.log("\bAll down in: ");
     console.timeEnd(timer);
   });
 }
 
 export async function orchestrator(rawArgs) {
-  let orchestratorTime = "orchestratorTime";
+  lg.banner();
+
+  let orchestratorTime = "\n[*] Total execution time";
   let config = overWriteConfig(parseArgumentsIntoConfig(rawArgs));
 
   console.time(orchestratorTime);
@@ -288,7 +299,10 @@ export async function orchestrator(rawArgs) {
       afterPromises(config, orchestratorTime);
       const failedPromises = promises.filter(promise => promise.status === 'rejected');
       if(failedPromises.length){
-          setTimeout(() => sh.exit(1), 5000);
+          setTimeout(() => {
+            lg.step('Exit code: 1');
+            sh.exit(1);
+          }, 5000);
       }
     });
 }

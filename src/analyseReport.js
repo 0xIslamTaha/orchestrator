@@ -7,6 +7,7 @@ import {
   writeJsonFile,
 } from "./helper.js";
 import path from "path";
+import * as lg from "./logger";
 
 
 const browsers = ["chrome", "firefox"];
@@ -43,8 +44,6 @@ function updateSpecData(suites, specName) {
 }
 
 export function analyseReport(mochaReportPath, executiontimeReportJsonPath) {
-  console.log("analyse the json report .... ");
-
   if (checkFileIsExisting(mochaReportPath)) {
     const executionTimeReportDir = path.dirname(executiontimeReportJsonPath);
     const executionTimeReporJson = executiontimeReportJsonPath.split("/").pop();
@@ -61,9 +60,7 @@ export function analyseReport(mochaReportPath, executiontimeReportJsonPath) {
     writeJsonFile(specs, executionTimeReportDir, executionTimeReporJson);
 
     for (let browser of browsers) {
-      console.log(
-        `------------------------- ${browser} -------------------------`
-      ); 
+      lg.subStep(`${browser}`);
       let data = orderBasedOnBrowserDuration(specs, browser).map((spec) => {
         return {
           specName: spec.specName,
