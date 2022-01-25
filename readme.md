@@ -32,7 +32,7 @@ The orchestrator can measure and report the execution time for each spec per bro
 ## ⌨️ Operating Systems:
 - Linux: working out of the box.
 - MacOS: please exeucte `brew install coreutils` command.
-- We are not supporting Windows yet.
+- Windows: fully supported
 
 ## 👌 Installation:
 * Install from npm
