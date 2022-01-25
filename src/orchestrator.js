@@ -170,7 +170,7 @@ function genearateSpecsCommandsForMachines(config, browser) {
     let result = "";
     listOfspecsPerMachine.forEach((spec) => {
       let specPath = path.join(config.specsDockerPath, spec);
-      result = `${result},${specPath}`;
+      result = `${result},${specPath.replace(/\\/g, "/")}`;
     });
     specsCommandsOverMachines.push(result.slice(1));
   });
