@@ -34,6 +34,7 @@ The orchestrator can measure and report the execution time for each spec per bro
 - MacOS: please exeucte `brew install coreutils` command.
 - Windows 10: fully supported via [WSL](https://docs.microsoft.com/en-us/windows/wsl/install).
 
+
 ## 👌 Installation:
 * Install from npm
 ```bash
