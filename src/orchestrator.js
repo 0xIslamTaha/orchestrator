@@ -15,7 +15,7 @@ import * as lg from "./logger";
 import { checkRequirements  } from "./checker";
 
 
-const executionTimeReportDir = "executionTimeReprot";
+const executionTimeReportDir = "executionTimeReport";
 const executionTimeReportDirPath = path.resolve(process.cwd(), executionTimeReportDir)
 const executiontimeReportJson = "specsExecutionTime.json"
 const executiontimeReportJsonPath = path.join(executionTimeReportDirPath, executiontimeReportJson)
