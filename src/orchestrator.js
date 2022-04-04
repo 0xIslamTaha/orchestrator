@@ -241,7 +241,7 @@ function generateReport(config) {
   lg.step("Generate the reports", true);
   return merge({ files: [config.mochawesomeJSONPath] })
     .then((report) =>{
-      lg.subStep(`HTML report: ${config.reportPath}/mochawsome.html`);
+      lg.subStep(`HTML report: ${config.reportPath}/mochawesome.html`);
       marge.create(report, {
         reportDir: config.reportPath,
         charts: true,
