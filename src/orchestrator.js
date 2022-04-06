@@ -12,13 +12,18 @@ import {
   orderBasedOnBrowserDuration,
 } from "./helper.js";
 import * as lg from "./logger";
-import { checkRequirements  } from "./checker";
-
+import { checkRequirements } from "./checker";
 
 const executionTimeReportDir = "executionTimeReport";
-const executionTimeReportDirPath = path.resolve(process.cwd(), executionTimeReportDir)
-const executiontimeReportJson = "specsExecutionTime.json"
-const executiontimeReportJsonPath = path.join(executionTimeReportDirPath, executiontimeReportJson)
+const executionTimeReportDirPath = path.resolve(
+  process.cwd(),
+  executionTimeReportDir
+);
+const executiontimeReportJson = "specsExecutionTime.json";
+const executiontimeReportJsonPath = path.join(
+  executionTimeReportDirPath,
+  executiontimeReportJson
+);
 
 function execa(command, flag = true) {
   return new Promise((resolve, reject) =>
@@ -78,8 +83,8 @@ function parseArgumentsIntoConfig(rawArgs) {
 }
 
 function overWriteConfig(args) {
-  lg.step('Overwrite the config file with the arguments if there is any', true);
-  const configFile = args["--config"] || path.resolve(__dirname, "config.json");
+  lg.step("Overwrite the config file with the arguments if there is any", true);
+  const configFile = args["--config"] || path.resolve(__dirname, "orchestrator.json");
   const defaultConfig = JSON.parse(fs.readFileSync(configFile, "utf-8"));
   const config = { ...defaultConfig, ...args };
   return config;
@@ -102,13 +107,23 @@ function execPreCommands(config) {
   });
 }
 
+function extractDockerComposeOptions(config) {
+  let dockerComposeOptions = "";
+  Object.keys(config.dockerComposeOptions).forEach((option) => {
+   dockerComposeOptions = `${dockerComposeOptions} ${option} ${config.dockerComposeOptions[option]}`;
+  });
+  return dockerComposeOptions;
+}
+
 function getListOfSpecs(config, browser) {
   let existingSpecs = [];
 
   if (config.specs.length > 0) {
     existingSpecs = [...config.specs];
   } else {
-    existingSpecs = sh.ls('-R', config.specsHomePath).filter((val) => val.match(/.*ts|js/));
+    existingSpecs = sh
+      .ls("-R", config.specsHomePath)
+      .filter((val) => val.match(/.*ts|js/));
   }
 
   if (checkFileIsExisting(executiontimeReportJsonPath)) {
@@ -216,13 +231,14 @@ function upConrainters(config) {
   let commands = [];
   let [container_name, command] = ["", ""];
   let bashCommands = _constructCypressCommands(config);
+  let dockerComposeOptions = extractDockerComposeOptions(config);
 
   bashCommands.forEach((cmd) => {
     container_name = `container_${Math.floor(
       Math.random() * 100000
     )}__${bashCommands.indexOf(cmd)}`;
 
-    command = `timeout --preserve-status ${config.timeout} docker-compose -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContainerName} bash -c '${cmd}'`;
+    command = `timeout --preserve-status ${config.timeout} docker-compose ${dockerComposeOptions} -f ${config.dockerComposePath} run --name ${container_name} ${config.cypressContainerName} bash -c '${cmd}'`;
     commands.push(command);
     lg.subStep(`~$ ${command}`);
     promises.push(execa(command));
@@ -232,29 +248,31 @@ function upConrainters(config) {
 }
 
 function downContainers(config) {
+  let dockerComposeOptions = extractDockerComposeOptions(config);
   lg.step("Stop the cypress containers", true);
-  let dockerComposeDown = `docker-compose -f ${config.dockerComposePath} down`;
+  let dockerComposeDown = `docker-compose ${dockerComposeOptions} -f ${config.dockerComposePath} down`;
   sh.exec(dockerComposeDown);
 }
 
 function generateReport(config) {
   lg.step("Generate the reports", true);
   return merge({ files: [config.mochawesomeJSONPath] })
-    .then((report) =>{
+    .then((report) => {
       lg.subStep(`HTML report: ${config.reportPath}/mochawesome.html`);
       marge.create(report, {
         reportDir: config.reportPath,
         charts: true,
         saveJson: true,
-      })
-
+      });
     })
     .then(() => {
       if (config.analyseReport) {
-        if (!fs.existsSync(executionTimeReportDirPath)){
+        if (!fs.existsSync(executionTimeReportDirPath)) {
           sh.mkdir(executionTimeReportDirPath);
         }
-        lg.subStep(`Execution time report: ${executionTimeReportDir}/${executiontimeReportJson}`);
+        lg.subStep(
+          `Execution time report: ${executionTimeReportDir}/${executiontimeReportJson}`
+        );
         _analyseReport(config);
       }
     });
@@ -296,15 +314,16 @@ export async function orchestrator(rawArgs) {
   setEnvVars(config);
   execPreCommands(config);
 
-  Promise.allSettled(upConrainters(config))
-    .then(promises => {
-      afterPromises(config, orchestratorTime);
-      const failedPromises = promises.filter(promise => promise.status === 'rejected');
-      if(failedPromises.length){
-          setTimeout(() => {
-            lg.step('Exit code: 1');
-            sh.exit(1);
-          }, 5000);
-      }
-    });
+  Promise.allSettled(upConrainters(config)).then((promises) => {
+    afterPromises(config, orchestratorTime);
+    const failedPromises = promises.filter(
+      (promise) => promise.status === "rejected"
+    );
+    if (failedPromises.length) {
+      setTimeout(() => {
+        lg.step("Exit code: 1");
+        sh.exit(1);
+      }, 5000);
+    }
+  });
 }

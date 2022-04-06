@@ -23,11 +23,11 @@ Check the following repo as a public use case.
 * Generate one HTML report that has all specs execution results.
 * Analyse the execution time for each spec.
 * Generate the execution time reports per browser under ExecutionTimeReport dir.
-* In the next run, The orchestrator It will split the test cases based on this execution time report to reduce the exeuction time.
+* In the next run, The orchestrator will split the test cases based on this execution time report to reduce the execution time.
 
 
 ## 🏹 The Splitting mechanism:
-The orchestrator can measure and report the execution time for each spec per browser. It will report it as `mochawesome-report/specsExecutionTime-chrome.json` file. If you provided this path as `specsExecutionTimePath`  in the next run, The orchestrator will split the specs based on its execution time to minimize the total execution time 🚀. 
+The orchestrator can measure and report the execution time for each spec per browser. It will report it as `mochawesome-report/specsExecutionTime-chrome.json` file. If you provided this path as `specsExecutionTimePath`  in the next run, The orchestrator will split the specs-based on its execution time to minimize the total execution time 🚀. 
 
 ## ⌨️ Operating Systems:
 - Linux: working out of the box.
@@ -75,7 +75,7 @@ services:
 }
 ```
 
-3- Edit the orchestrator [configuration file](/src/config.json) with your configuration. Here is the description of each configuration option.
+3- Edit the orchestrator [configuration file](/src/orchestrator.json) with your configuration. Here is the description of each configuration option.
 
 ```
 - parallelizm:
@@ -102,6 +102,11 @@ services:
     description: list of commands to be executed befor the deployment of the cypress containers
     type: list
     example: ["ls -al", "mkdir -p test"],
+
+- dockerComposeOptions:
+    description: docker-compose options to be passed to the docker-compose commands
+    type: dict
+    example: {"-p": "project_name"}
 
 - dockerComposePath:
     description: path to the docker compose file.
@@ -149,12 +154,12 @@ services:
 
 * With your configuration file
 ```bash
-npx orchestrator --config "/path/to/config.json"
+npx orchestrator --config "/path/to/orchestrator.json"
 ```
 
-* You can **overwrite** any configuration param on the fly, simplly path the new configuration as a prameter.
+* You can **overwrite** any configuration param on the fly, simpelly path the new configuration as a prameter.
 ```bash
-npx orchestrator --config ./src/config.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]" --specs "[alerts.js, avatar.js]"
+npx orchestrator --config ./src/orchestrator.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]" --specs "[alerts.js, avatar.js]"
 ```
 
 ## 📖 Reports: 
@@ -165,6 +170,5 @@ The orchestrator generates two reports by default:
 
 
 ## 🎬 To-Do:
-* Export COMPOSE_PROJECT_NAME with random value if it doesn't exist.
 * list configuration rather than multiple files for multiple test suites.
 * Provide --help option.
