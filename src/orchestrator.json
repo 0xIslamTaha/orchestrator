@@ -1,13 +1,18 @@
 {
-  "parallelizm": 1,
+  "parallelizm": 2,
   "browsers": ["chrome", "firefox"],
   "timeout": "20m",
   "environment": {
     "DOCKER_TAG": "master_283"
   },
   "preCommands": [
-    "docker-compose -f /opt/code/github/design-system/cypress.docker-compose.yml up -d cloud_fe_components"
+    "echo 'START ORCHESTRATOR'",
+    "rm -rf cypress/report/* #Remove the old reports",
+    "mkdir -p mochawesome-report"
   ],
+  "dockerComposeOptions": {
+    "-p": "orchestator_public_use_case_project_name"
+  },
   "dockerComposePath": "/opt/code/github/design-system/cypress.docker-compose.yml",
   "specsHomePath": "/opt/code/github/design-system/tests/cypress/storybook/",
   "specsDockerPath": "tests/cypress/storybook/",
@@ -15,6 +20,6 @@
   "mochawesomeJSONPath": "/opt/code/github/design-system/tests/report/mochawesome-report/*.json",
   "reportPath": "mochawesome-report",
   "specs": [],
-  "analyseReport": false,
+  "analyseReport": true,
   "specsExecutionTimePath": "mochawesome-report/specsExecutionTime-chrome.json"
 }
