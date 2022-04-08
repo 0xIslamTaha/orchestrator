@@ -157,7 +157,7 @@ services:
 npx orchestrator --config "/path/to/orchestrator.json"
 ```
 
-* You can **overwrite** any configuration param on the fly, simpelly path the new configuration as a prameter.
+* You can **overwrite** any configuration param on the fly, simply pass the new configuration as a parameter.
 ```bash
 npx orchestrator --config ./src/orchestrator.json --parallelizm 2 --environment '{"DOCKER_TAG":"master_283"}' --browsers "[chrome, firefox]" --specs "[alerts.js, avatar.js]"
 ```
