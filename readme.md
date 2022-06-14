@@ -172,3 +172,6 @@ The orchestrator generates two reports by default:
 ## 🎬 To-Do:
 * list configuration rather than multiple files for multiple test suites.
 * Provide --help option.
+
+## License:
+The orchestrator is licensed under the MIT license.
